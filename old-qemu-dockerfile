@@ -1,13 +1,13 @@
 FROM ubuntu:20.04
 USER root
-ADD adjust-apt-sources.sh /root/adjust-apt-sources.sh
-RUN /root/adjust-apt-sources.sh && \
-    dpkg --add-architecture armhf && \
-    apt-get -y update && \
+RUN apt-get -y update && \
     apt-get install -y --no-install-recommends \
-        qemu-user-static=1:4.2-3ubuntu6.17 \
+        binutils-arm-linux-gnueabihf \
+        cmake \
+        g++-arm-linux-gnueabihf \
         gcc-arm-linux-gnueabihf \
         libc6-dev-armhf-cross \
-        libgoogle-perftools-dev:armhf
+        ninja-build \
+        qemu-user-static=1:4.2-3ubuntu6.17
 ENV QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf/
 WORKDIR /build

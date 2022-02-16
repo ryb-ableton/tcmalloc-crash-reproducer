@@ -11,7 +11,16 @@ docker build --platform linux/amd64 -f new-qemu-dockerfile -t new-qemu .
 
 run_in_docker="docker run --init -t --platform linux/amd64 --rm -v $PWD:/build"
 
-$run_in_docker old-qemu arm-linux-gnueabihf-gcc -g -Wall -o test test.c -ltcmalloc
+mkdir -p gperftools-build
+$run_in_docker old-qemu cmake -G Ninja -S /build/gperftools -B /build/gperftools-build \
+    -DCMAKE_AR=/usr/bin/arm-linux-gnueabihf-ar \
+    -DCMAKE_CXX_COMPILER=/usr/bin/arm-linux-gnueabihf-g++ \
+    -DCMAKE_C_COMPILER=/usr/bin/arm-linux-gnueabihf-gcc \
+    -DCMAKE_RANLIB=/usr/bin/arm-linux-gnueabihf-ranlib
+$run_in_docker old-qemu ninja -C /build/gperftools-build tcmalloc_debug
+
+$run_in_docker old-qemu arm-linux-gnueabihf-gcc -g -Wall -o test test.c \
+    -Wl,-rpath=gperftools-build gperftools-build/libtcmalloc_debug.so
 $run_in_docker old-qemu qemu-arm-static --version
 $run_in_docker old-qemu qemu-arm-static -d page ./test
 
