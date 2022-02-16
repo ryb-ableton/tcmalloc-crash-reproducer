@@ -23,12 +23,13 @@ int main()
 
   fprintf(stderr, "sbrk: %p\n", sbrk(0));
 
-  const int kTotalBytes = 1024 * 1024 * 64;   // 64 MiB
-  const int kPerAllocationBytes = 1024 * 200; // 200 KiB
+  const int kTotalBytes = 1024 * 1024 * 64;      // 64 MiB
+  const int kInitialAllocationBytes = 1024 * 16; // 16 KiB
+  const int kPerAllocationBytes = 1024 * 200;    // 200 KiB
 
   for (int i = 0; i < kTotalBytes; i += kPerAllocationBytes)
   {
-    void* p = malloc(kPerAllocationBytes);
+    void* p = malloc(i == 0 ? kInitialAllocationBytes : kPerAllocationBytes);
     fprintf(stderr, "%p ", p);
   }
   fprintf(stderr, "\n");
